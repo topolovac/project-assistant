@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 )
 
@@ -27,7 +26,6 @@ func getDirectoryInfo(path string) (Directory, error) {
 				return Directory{}, err
 			}
 
-			fmt.Println(entry.Type())
 			file := File{
 				Name:    entry.Name(),
 				Type:    entry.Type().String(),
