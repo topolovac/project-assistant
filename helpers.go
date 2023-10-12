@@ -42,3 +42,17 @@ func getDirectoryInfo(path string) (Directory, error) {
 	}
 	return directory, err
 }
+
+func createMDFile(content string, path string) error {
+	file, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = file.WriteString(content)
+	if err != nil {
+		return err
+	}
+	return nil
+}
