@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 )
@@ -18,15 +17,22 @@ func main() {
 		panic("Please provide a valid jwt and directory name")
 	}
 
-	dir, err := getDirectoryInfo(*directory_name)
+	config := getConfig(*directory_name)
+
+	err := createOutputDir(*directory_name, config)
+
 	if err != nil {
 		panic(err)
 	}
 
-	jsonVal, err := json.MarshalIndent(dir, "", "\t")
+	logStructAsJSON(config)
+
+	dir_info, err := getDirectoryInfo(*directory_name, config)
 	if err != nil {
 		panic(err)
 	}
+
+	logStructAsJSON(dir_info)
 
 	oai := OpenAI{
 		jwt: *jwt,
@@ -34,12 +40,20 @@ func main() {
 
 	oai.Init(oai.jwt)
 
-	content, err := oai.CreateDocumentationRequest(string(jsonVal))
+	save_path := "./" + *directory_name + "/" + config.OutputDir + "/documentation.md"
+
+	fmt.Println("Creating documentation for " + *directory_name + " in " + save_path)
+
+	content, err := oai.CreateDocumentationRequest(dir_info)
 	if err != nil {
 		panic(err)
 	}
 
-	createMDFile(content, "./documentation_example_results/"+*directory_name+".md")
+	err = createMDFile(content, save_path)
 
-	fmt.Println("Completed creating documentation for " + *directory_name + " in ./documentation_example_results/" + *directory_name + ".md")
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Completed creating documentation for " + *directory_name + " in " + save_path)
 }

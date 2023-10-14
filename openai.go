@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/sashabaranov/go-openai"
@@ -34,7 +35,12 @@ func (oai *OpenAI) completionRequest(messages []openai.ChatCompletionMessage) (s
 	return resp.Choices[0].Message.Content, err
 }
 
-func (oai *OpenAI) CreateDocumentationRequest(json string) (string, error) {
+func (oai *OpenAI) CreateDocumentationRequest(dir_info Directory) (string, error) {
+	json, err := json.Marshal(dir_info)
+	if err != nil {
+		return "", err
+	}
+
 	content, err := oai.completionRequest([]openai.ChatCompletionMessage{
 		{
 			Role:    openai.ChatMessageRoleSystem,
@@ -42,7 +48,7 @@ func (oai *OpenAI) CreateDocumentationRequest(json string) (string, error) {
 		},
 		{
 			Role:    openai.ChatMessageRoleUser,
-			Content: json,
+			Content: string(json),
 		},
 	})
 	return content, err
