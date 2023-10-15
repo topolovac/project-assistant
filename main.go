@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 )
 
@@ -69,29 +70,29 @@ func (app *Application) CreateDocumentation(dir_info Directory, save_path string
 func (app *Application) UpdateCodebase(dir_info Directory) error {
 	fmt.Println("Updating codebase...")
 
-	// command := CodeUpdateCommand{
-	// 	TaskType:           "FEATURE",
-	// 	Name:               "Update files function",
-	// 	Description:        "Implement function that will update existing codebase",
-	// 	AcceptanceCriteria: "Function accepts Directory struct and updates existing files or creates new ones",
-	// 	Codebase:           dir_info,
-	// }
+	command := CodeUpdateCommand{
+		TaskType:           "FEATURE",
+		Name:               "Update files function",
+		Description:        "Implement function that will update existing codebase",
+		AcceptanceCriteria: "Function accepts Directory struct and updates existing files or creates new ones",
+		Codebase:           dir_info,
+	}
 
-	// content, err := app.openAI.CreateCodeUpdateRequest(command)
+	content, err := app.openAI.CreateCodeUpdateRequest(command)
 
-	// updated_dir := &Directory{}
+	updated_dir := &Directory{}
 
-	// if err != nil {
-	// 	return err
-	// }
+	if err != nil {
+		return err
+	}
 
-	// err = json.Unmarshal([]byte(content), updated_dir)
+	err = json.Unmarshal([]byte(content), updated_dir)
 
-	// if err != nil {
-	// 	return err
-	// }
+	if err != nil {
+		return err
+	}
 
-	err := updateDirectory(dir_info)
+	err = updateDirectory(*updated_dir)
 
 	if err != nil {
 		return err
