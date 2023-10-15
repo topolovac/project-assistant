@@ -80,13 +80,13 @@ func shouldEntryBeIgnored(entry_name string, config *Config) bool {
 	return false
 }
 
-func createOutputDir(path string, config *Config) error {
-	dir, _ := os.Stat(path + "/" + config.OutputDir)
+func createOutputDir(config *Config) error {
+	dir, _ := os.Stat(config.RootPath + "/" + config.OutputDir)
 	if dir != nil {
 		return nil
 	}
 
-	err := os.Mkdir(path+"/"+config.OutputDir, 0755)
+	err := os.Mkdir(config.RootPath+"/"+config.OutputDir, 0755)
 	if err != nil {
 		return err
 	}
@@ -105,35 +105,6 @@ func createMDFile(content string, path string) error {
 		return err
 	}
 	return nil
-}
-
-var config_file_name = "project_assistant.config.json"
-
-func getConfig(path string) *Config {
-	default_config := &Config{
-		OutputDir: CONFIG_DEFAULT_OUTPUT_DIR,
-		IgnoreSettings: IgnoreSettings{
-			IgnoreFiles:            []string{},
-			IgnoreDirs:             []string{},
-			IgnoreFilesWithPattern: []string{},
-		},
-	}
-
-	content, err := os.ReadFile(path + "/" + config_file_name)
-	if err != nil {
-		fmt.Println("Error reading config file: ", err)
-		return default_config
-	}
-
-	err = json.Unmarshal(content, default_config)
-	if err != nil {
-		fmt.Println("Error unmarshalling config file: ", err)
-		return default_config
-	}
-
-	// add config file to ignore files
-	default_config.IgnoreSettings.IgnoreFiles = append(default_config.IgnoreSettings.IgnoreFiles, config_file_name)
-	return default_config
 }
 
 func logStructAsJSON(s interface{}) {

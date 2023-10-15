@@ -21,6 +21,13 @@ type IgnoreSettings struct {
 var CONFIG_DEFAULT_OUTPUT_DIR = "project_assistant"
 
 type Config struct {
+	RootPath       string         `json:"root_path"`
+	OpenAIKey      string         `json:"openai_key"`
 	OutputDir      string         `json:"output_dir"`
 	IgnoreSettings IgnoreSettings `json:"ignore_settings"`
+}
+
+type Flags struct {
+	jwt            string
+	directory_name string
 }
