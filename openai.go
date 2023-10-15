@@ -22,7 +22,7 @@ func (oai *OpenAI) completionRequest(messages []openai.ChatCompletionMessage) (s
 	resp, err := oai.client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
-			Model:    openai.GPT3Dot5Turbo,
+			Model:    openai.GPT3Dot5Turbo16K,
 			Messages: messages,
 		},
 	)
@@ -51,5 +51,41 @@ func (oai *OpenAI) CreateDocumentationRequest(dir_info Directory) (string, error
 			Content: string(json),
 		},
 	})
+	return content, err
+}
+
+func (oai *OpenAI) CreateCodeUpdateRequest(command CodeUpdateCommand) (string, error) {
+	json, err := json.Marshal(command.Codebase)
+	if err != nil {
+		return "", err
+	}
+
+	content, err := oai.completionRequest([]openai.ChatCompletionMessage{
+		{
+			Role:    openai.ChatMessageRoleSystem,
+			Content: PROMPT_SM_CODE_UPDATE,
+		},
+		{
+			Role:    openai.ChatMessageRoleUser,
+			Content: "TASK NAME:" + command.Name,
+		},
+		{
+			Role:    openai.ChatMessageRoleUser,
+			Content: "TASK DESCRIPTION:" + command.Description,
+		},
+		{
+			Role:    openai.ChatMessageRoleUser,
+			Content: "TASK ACCEPTANCE CRITERIA:" + command.AcceptanceCriteria,
+		},
+		{
+			Role:    openai.ChatMessageRoleUser,
+			Content: "CODEBASE",
+		},
+		{
+			Role:    openai.ChatMessageRoleUser,
+			Content: string(json),
+		},
+	})
+
 	return content, err
 }

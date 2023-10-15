@@ -115,3 +115,55 @@ func logStructAsJSON(s interface{}) {
 
 	fmt.Println(string(jsonVal))
 }
+
+func updateDirectory(dir Directory) error {
+	// update files
+	for _, file := range dir.Files {
+		if file.IsUpdated {
+			fmt.Println("Updating file " + file.Name + "...")
+			err := updateFile(dir.Name+"/"+file.Name, file.Content)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	// create new files
+	for _, file := range dir.Files {
+		if file.IsNew {
+			fmt.Println("Creating file " + file.Name + "...")
+			err := createFile(dir.Name+"/"+file.Name, file.Content)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	// update directories
+	for _, directory := range dir.Directories {
+		err := updateDirectory(directory)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func updateFile(path string, content string) error {
+	err := os.WriteFile(path, []byte(content), 0644)
+	if err != nil {
+		fmt.Println("Error writing file: ", err)
+		return err
+	}
+	return nil
+}
+
+func createFile(path string, content string) error {
+	err := os.WriteFile(path, []byte(content), 0644)
+	if err != nil {
+		fmt.Println("Error writing file: ", err)
+		return err
+	}
+	return nil
+}

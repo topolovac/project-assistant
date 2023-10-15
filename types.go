@@ -1,15 +1,17 @@
 package main
 
 type Directory struct {
-	Name        string
-	Files       []File
-	Directories []Directory
+	Name        string      `json:"name"`
+	Files       []File      `json:"files"`
+	Directories []Directory `json:"directories"`
 }
 
 type File struct {
-	Name    string
-	Type    string
-	Content string
+	Name      string `json:"name"`
+	Type      string `json:"type"`
+	Content   string `json:"content"`
+	IsUpdated bool   `json:"is_updated"`
+	IsNew     bool   `json:"is_new"`
 }
 
 type IgnoreSettings struct {
@@ -30,4 +32,12 @@ type Config struct {
 type Flags struct {
 	jwt            string
 	directory_name string
+}
+
+type CodeUpdateCommand struct {
+	TaskType           string    `json:"task_type"`
+	Name               string    `json:"name"`
+	Description        string    `json:"description"`
+	AcceptanceCriteria string    `json:"acceptance_criteria"`
+	Codebase           Directory `json:"codebase"`
 }
