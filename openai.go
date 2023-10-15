@@ -44,7 +44,7 @@ func (oai *OpenAI) CreateDocumentationRequest(dir_info Directory) (string, error
 	content, err := oai.completionRequest([]openai.ChatCompletionMessage{
 		{
 			Role:    openai.ChatMessageRoleSystem,
-			Content: DOCUMENTATION_SYSTEM_MESSAGE,
+			Content: PROMPT_SM_DOCUMENTATION,
 		},
 		{
 			Role:    openai.ChatMessageRoleUser,
