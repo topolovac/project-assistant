@@ -1,8 +1,0 @@
-{
-  "output_dir": "pa_docs",
-  "ignore_settings": {
-    "ignore_files": [],
-    "ignore_dirs": ["pa_docs", "private_folder"],
-    "ignore_files_with_pattern": [".ignored"]
-  }
-}
