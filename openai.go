@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 
 	"github.com/sashabaranov/go-openai"
 )
@@ -28,7 +29,7 @@ func (oai *OpenAI) completionRequest(messages []openai.ChatCompletionMessage) (s
 	)
 
 	if err != nil {
-		fmt.Printf("ChatCompletion error: %v\n", err)
+		log.Printf("ChatCompletion error: %v\n", err)
 		return "", err
 	}
 
@@ -38,6 +39,7 @@ func (oai *OpenAI) completionRequest(messages []openai.ChatCompletionMessage) (s
 func (oai *OpenAI) CreateDocumentationRequest(dir_info Directory) (string, error) {
 	json, err := json.Marshal(dir_info)
 	if err != nil {
+		log.Println("Error marshalling directory info: ", err)
 		return "", err
 	}
 
@@ -57,33 +59,17 @@ func (oai *OpenAI) CreateDocumentationRequest(dir_info Directory) (string, error
 func (oai *OpenAI) CreateCodeUpdateRequest(command CodeUpdateCommand) (string, error) {
 	json, err := json.Marshal(command.Codebase)
 	if err != nil {
+		log.Println("Error marshalling codebase: ", err)
 		return "", err
 	}
 
+	promt := fmt.Sprintf(PROMPT_SM_CODE_UPDATE, command.Name, command.TaskType, command.Description, command.AcceptanceCriteria, string(json))
+
+	log.Println("PROMPT: ", promt)
 	content, err := oai.completionRequest([]openai.ChatCompletionMessage{
 		{
 			Role:    openai.ChatMessageRoleSystem,
-			Content: PROMPT_SM_CODE_UPDATE,
-		},
-		{
-			Role:    openai.ChatMessageRoleUser,
-			Content: "TASK NAME:" + command.Name,
-		},
-		{
-			Role:    openai.ChatMessageRoleUser,
-			Content: "TASK DESCRIPTION:" + command.Description,
-		},
-		{
-			Role:    openai.ChatMessageRoleUser,
-			Content: "TASK ACCEPTANCE CRITERIA:" + command.AcceptanceCriteria,
-		},
-		{
-			Role:    openai.ChatMessageRoleUser,
-			Content: "CODEBASE",
-		},
-		{
-			Role:    openai.ChatMessageRoleUser,
-			Content: string(json),
+			Content: promt,
 		},
 	})
 

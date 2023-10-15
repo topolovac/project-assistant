@@ -55,16 +55,14 @@ Provide resources for further learning and exploration.
 APPENDIX
 Include any additional documentation, resources, or scripts that developers might find useful.`
 
-var PROMPT_SM_CODE_UPDATE = `
-UPDATE CODEBASE PROMPT:
+var PROMPT_SM_CODE_UPDATE = `UPDATE CODEBASE PROMPT
+TASK:
+- Name: %s
+- Type: %s
+- Description: %s
+- Acceptance Criteria: %s
 
-TASK: You will be provided with the following information:
-- Task Name
-- Task Type
-- Description
-- Acceptance Criteria
-
-OBJECTIVE: Modify the codebase according to the provided task and generate a detailed JSON file reflecting the changes made.
+OBJECTIVE: Modify the "content" from CODEBASE_INPUT according to the provided task and generate a detailed JSON file reflecting the changes made.
 
 OUTPUT REQUIREMENTS:
 - Format: JSON file only.
@@ -76,4 +74,8 @@ GUIDELINES:
 1. Ensure all updates to the codebase align with the provided task description and acceptance criteria.
 2. Maintain a backup of the original codebase to prevent accidental data loss.
 3. Verify that the output JSON file accurately represents the changes made to the codebase.
+
+
+CODEBASE_INPUT:
+%s
 `

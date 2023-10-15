@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 )
 
 type Application struct {
@@ -28,6 +29,7 @@ func main() {
 
 	dir_info, err := getDirectoryInfo(config.RootPath, config)
 	if err != nil {
+		log.Println("Error getting directory info: ", err)
 		panic(err)
 	}
 
@@ -40,35 +42,39 @@ func main() {
 	err = app.UpdateCodebase(dir_info)
 
 	if err != nil {
+		log.Println("Error updating codebase: ", err)
 		panic(err)
 	}
 }
 
 func (app *Application) CreateDocumentation(dir_info Directory, save_path string) {
-	fmt.Println("Creating documentation for " + app.config.RootPath + " in " + save_path)
+	log.Println("Creating documentation for " + app.config.RootPath + " in " + save_path)
 
 	content, err := app.openAI.CreateDocumentationRequest(dir_info)
 	if err != nil {
+		log.Println("Error creating documentation: ", err)
 		panic(err)
 	}
 
 	err = createOutputDir(app.config)
 
 	if err != nil {
+		log.Println("Error creating output directory: ", err)
 		panic(err)
 	}
 
 	err = createMDFile(content, save_path)
 
 	if err != nil {
+		log.Println("Error creating markdown file: ", err)
 		panic(err)
 	}
 
-	fmt.Println("Completed creating documentation for " + app.config.RootPath + " in " + save_path)
+	log.Println("Completed creating documentation for " + app.config.RootPath + " in " + save_path)
 }
 
 func (app *Application) UpdateCodebase(dir_info Directory) error {
-	fmt.Println("Updating codebase...")
+	log.Println("Updating codebase...")
 
 	command := CodeUpdateCommand{
 		TaskType:           "chore",
@@ -83,23 +89,25 @@ func (app *Application) UpdateCodebase(dir_info Directory) error {
 	updated_dir := &Directory{}
 
 	if err != nil {
+		log.Println("Error creating code update request: ", err)
 		return err
 	}
 
 	err = json.Unmarshal([]byte(content), updated_dir)
 
 	if err != nil {
-		fmt.Println("content: ", content)
-		fmt.Println("Error unmarshalling updated directory: ", err)
+		log.Println("Content: ", content)
+		log.Println("Error unmarshalling updated directory: ", err)
 		return err
 	}
 
-	fmt.Println("Updated directory: ")
+	log.Println("Updated directory: ")
 	logStructAsJSON(updated_dir)
 
 	err = updateDirectory(*updated_dir)
 
 	if err != nil {
+		log.Println("Error updating directory: ", err)
 		return err
 	}
 
