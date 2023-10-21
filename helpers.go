@@ -126,7 +126,7 @@ func updateDirectory(dir Directory) error {
 	for _, file := range dir.Files {
 		if file.IsUpdated {
 			log.Println("Updating file " + file.Name + "...")
-			err := updateFile(dir.Name+"/"+file.Name, file.Content)
+			err := updateOrCreateFile(dir.Name+"/"+file.Name, file.Content)
 			if err != nil {
 				log.Println("Error updating file: ", err)
 				return err
@@ -139,7 +139,7 @@ func updateDirectory(dir Directory) error {
 	for _, file := range dir.Files {
 		if file.IsNew {
 			log.Println("Creating file " + file.Name + "...")
-			err := createFile(dir.Name+"/"+file.Name, file.Content)
+			err := updateOrCreateFile(dir.Name+"/"+file.Name, file.Content)
 			if err != nil {
 				log.Println("Error creating file: ", err)
 				return err
@@ -161,7 +161,7 @@ func updateDirectory(dir Directory) error {
 	return nil
 }
 
-func updateFile(path string, content string) error {
+func updateOrCreateFile(path string, content string) error {
 	err := os.WriteFile(path, []byte(content), 0644)
 	if err != nil {
 		log.Println("Error writing file: ", err)
@@ -170,11 +170,26 @@ func updateFile(path string, content string) error {
 	return nil
 }
 
-func createFile(path string, content string) error {
-	err := os.WriteFile(path, []byte(content), 0644)
-	if err != nil {
-		log.Println("Error writing file: ", err)
-		return err
+type FlattenedDir struct {
+	filename string
+	path     string
+	content  string
+}
+
+func flattenDirectory(dir Directory) []FlattenedDir {
+	files := []FlattenedDir{}
+
+	for _, file := range dir.Files {
+		files = append(files, FlattenedDir{
+			filename: file.Name,
+			path:     dir.Name + "/" + file.Name,
+			content:  file.Content,
+		})
 	}
-	return nil
+
+	for _, directory := range dir.Directories {
+		files = append(files, flattenDirectory(directory)...)
+	}
+
+	return files
 }

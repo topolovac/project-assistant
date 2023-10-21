@@ -75,3 +75,33 @@ func (oai *OpenAI) CreateCodeUpdateRequest(command CodeUpdateCommand) (string, e
 
 	return content, err
 }
+
+func (oai *OpenAI) CreateFileSummaryRequest(content string) (string, error) {
+	content, err := oai.completionRequest([]openai.ChatCompletionMessage{
+		{
+			Role:    openai.ChatMessageRoleSystem,
+			Content: PROMPT_FILE_SUMMARY,
+		},
+		{
+			Role:    openai.ChatMessageRoleUser,
+			Content: content,
+		},
+	})
+
+	return content, err
+}
+
+func (oai *OpenAI) CreateProjectSummaryRequest(content string) (string, error) {
+	content, err := oai.completionRequest([]openai.ChatCompletionMessage{
+		{
+			Role:    openai.ChatMessageRoleSystem,
+			Content: PROMPT_PROJECT_SUMMARY,
+		},
+		{
+			Role:    openai.ChatMessageRoleUser,
+			Content: content,
+		},
+	})
+
+	return content, err
+}

@@ -79,3 +79,13 @@ GUIDELINES:
 CODEBASE_INPUT:
 %s
 `
+
+var PROMPT_FILE_SUMMARY = `FILE SUMMARY PROMPT
+You will be provided content from a file.
+Your task is to generate a summary of the file content.
+`
+
+var PROMPT_PROJECT_SUMMARY = `PROJECT SUMMARY PROMPT
+You will be provided summary for each project file.
+Your task is to generate a summary of the project.
+`

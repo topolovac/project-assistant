@@ -32,18 +32,19 @@ func main() {
 		panic(err)
 	}
 
-	logStructAsJSON(dir_info)
-
+	// create documentation example
 	// save_path := "./" + config.RootPath + "/" + config.OutputDir + "/documentation.md"
-
 	// app.CreateDocumentation(dir_info, save_path)
 
-	err = app.UpdateCodebase(dir_info)
+	// update codebase example
+	// err = app.UpdateCodebase(dir_info)
+	// if err != nil {
+	// 	log.Println("Error updating codebase: ", err)
+	// 	panic(err)
+	// }
 
-	if err != nil {
-		log.Println("Error updating codebase: ", err)
-		panic(err)
-	}
+	// create project summary example
+	app.createProjectSummary(dir_info)
 }
 
 func (app *Application) CreateDocumentation(dir_info Directory, save_path string) {
@@ -107,6 +108,51 @@ func (app *Application) UpdateCodebase(dir_info Directory) error {
 
 	if err != nil {
 		log.Println("Error updating directory: ", err)
+		return err
+	}
+
+	return nil
+}
+
+func (app *Application) createProjectSummary(dir_info Directory) error {
+	log.Println("Creating file summary...")
+
+	fd := flattenDirectory(dir_info)
+
+	grouped_file_summary := ""
+
+	for _, file := range fd {
+		log.Println("Creating summary for file: ", file.content)
+		content, err := app.openAI.CreateFileSummaryRequest(file.content)
+
+		if err != nil {
+			log.Println("Error creating file summary: ", err)
+			return err
+		}
+		log.Println("Content: ", content)
+		grouped_file_summary += "FILE_PATH:" + file.path + "\nFILE_NAME:" + file.filename + "\nCONTENT:" + content + "\n\n"
+	}
+
+	log.Println("Grouped file summary: ", grouped_file_summary)
+
+	err := createMDFile(grouped_file_summary, app.config.RootPath+"/"+app.config.OutputDir+"/file_summary.md")
+
+	if err != nil {
+		log.Println("Error creating file summary: ", err)
+		return err
+	}
+
+	content, err := app.openAI.CreateProjectSummaryRequest(grouped_file_summary)
+
+	if err != nil {
+		log.Println("Error creating project summary: ", err)
+		return err
+	}
+
+	err = createMDFile(content, app.config.RootPath+"/"+app.config.OutputDir+"/project_summary.md")
+
+	if err != nil {
+		log.Println("Error creating project summary: ", err)
 		return err
 	}
 
