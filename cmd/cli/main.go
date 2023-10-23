@@ -26,6 +26,13 @@ func main() {
 
 	logStructAsJSON(config)
 
+	err := createOutputDir(app.config)
+
+	if err != nil {
+		log.Println("Error creating output directory: ", err)
+		panic(err)
+	}
+
 	dir_info, err := getDirectoryInfo(config.RootPath, config)
 	if err != nil {
 		log.Println("Error getting directory info: ", err)
@@ -53,13 +60,6 @@ func (app *Application) CreateDocumentation(dir_info Directory, save_path string
 	content, err := app.openAI.CreateDocumentationRequest(dir_info)
 	if err != nil {
 		log.Println("Error creating documentation: ", err)
-		panic(err)
-	}
-
-	err = createOutputDir(app.config)
-
-	if err != nil {
-		log.Println("Error creating output directory: ", err)
 		panic(err)
 	}
 

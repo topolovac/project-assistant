@@ -65,7 +65,6 @@ func (oai *OpenAI) CreateCodeUpdateRequest(command CodeUpdateCommand) (string, e
 
 	promt := fmt.Sprintf(PROMPT_SM_CODE_UPDATE, command.Name, command.TaskType, command.Description, command.AcceptanceCriteria, string(json))
 
-	log.Println("PROMPT: ", promt)
 	content, err := oai.completionRequest([]openai.ChatCompletionMessage{
 		{
 			Role:    openai.ChatMessageRoleSystem,

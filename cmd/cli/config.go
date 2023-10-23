@@ -18,8 +18,13 @@ func getConfig() *Config {
 		OpenAIKey: flags.jwt,
 		OutputDir: CONFIG_DEFAULT_OUTPUT_DIR,
 		IgnoreSettings: IgnoreSettings{
-			IgnoreFiles:            []string{},
-			IgnoreDirs:             []string{},
+			IgnoreFiles: []string{
+				".DS_Store",
+				".gitingore",
+			},
+			IgnoreDirs: []string{
+				"node_modules",
+			},
 			IgnoreFilesWithPattern: []string{},
 		},
 	}
