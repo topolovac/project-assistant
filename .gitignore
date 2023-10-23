@@ -21,3 +21,5 @@
 go.work
 
 documentation_example_results/
+
+.env

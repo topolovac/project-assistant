@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"flag"
+	"errors"
 	"fmt"
 	"os"
 )
@@ -10,12 +10,8 @@ import (
 var config_file_name = "project_assistant.config.json"
 
 func getConfig() *Config {
-
-	flags := getFlags()
-
 	default_config := &Config{
-		RootPath:  flags.directory_name,
-		OpenAIKey: flags.jwt,
+		RootPath:  ".",
 		OutputDir: CONFIG_DEFAULT_OUTPUT_DIR,
 		IgnoreSettings: IgnoreSettings{
 			IgnoreFiles: []string{
@@ -29,7 +25,11 @@ func getConfig() *Config {
 		},
 	}
 
-	content, err := os.ReadFile(flags.directory_name + "/" + config_file_name)
+	if _, err := os.Stat(config_file_name); errors.Is(err, os.ErrNotExist) {
+		return default_config
+	}
+
+	content, err := os.ReadFile("./" + config_file_name)
 	if err != nil {
 		fmt.Println("Error reading config file: ", err)
 		return default_config
@@ -44,20 +44,4 @@ func getConfig() *Config {
 	// add config file to ignore files
 	default_config.IgnoreSettings.IgnoreFiles = append(default_config.IgnoreSettings.IgnoreFiles, config_file_name)
 	return default_config
-}
-
-func getFlags() *Flags {
-	jwt := flag.String("jwt", "", "OpenAI API key")
-	directory_name := flag.String("directory", "", "Directory to create documentation for")
-
-	flag.Parse()
-
-	if *jwt == "" || *directory_name == "" {
-		panic("Please provide a valid jwt and directory name")
-	}
-
-	return &Flags{
-		jwt:            *jwt,
-		directory_name: *directory_name,
-	}
 }
