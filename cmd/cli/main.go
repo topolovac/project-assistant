@@ -40,7 +40,7 @@ func main() {
 		Name:  "pa",
 		Usage: "Project Assistant for your codebase",
 		Commands: []*cli.Command{
-			Info,
+			Init,
 		},
 	}
 

@@ -4,44 +4,42 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 )
 
 var config_file_name = "project_assistant.config.json"
 
-func getConfig() *Config {
-	default_config := &Config{
-		RootPath:  ".",
-		OutputDir: CONFIG_DEFAULT_OUTPUT_DIR,
-		IgnoreSettings: IgnoreSettings{
-			IgnoreFiles: []string{
-				".DS_Store",
-				".gitingore",
-			},
-			IgnoreDirs: []string{
-				"node_modules",
-			},
-			IgnoreFilesWithPattern: []string{},
-		},
+func getConfig() (*Config, error) {
+	wd, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	if _, err := os.Stat(config_file_name); errors.Is(err, os.ErrNotExist) {
-		return default_config
+		return nil, errors.New("Config file does not exist. Create project_assistant.config.json in the root of your project.")
 	}
 
 	content, err := os.ReadFile("./" + config_file_name)
 	if err != nil {
-		fmt.Println("Error reading config file: ", err)
-		return default_config
+		return nil, err
 	}
 
-	err = json.Unmarshal(content, default_config)
+	conf := &Config{}
+
+	err = json.Unmarshal(content, conf)
 	if err != nil {
 		fmt.Println("Error unmarshalling config file: ", err)
-		return default_config
+		return nil, errors.New("Could not parse config file. Please make sure it is valid JSON.")
 	}
 
-	// add config file to ignore files
-	default_config.IgnoreSettings.IgnoreFiles = append(default_config.IgnoreSettings.IgnoreFiles, config_file_name)
-	return default_config
+	// append default ignore files
+	files := []string{
+		".DS_Store",
+		".gitingore",
+	}
+
+	conf.IgnoreSettings.IgnoreFiles = append(conf.IgnoreSettings.IgnoreFiles, files...)
+	conf.RootPath = wd + "/" + conf.RootPath
+	return conf, err
 }

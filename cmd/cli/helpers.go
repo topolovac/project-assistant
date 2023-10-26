@@ -7,7 +7,7 @@ import (
 	"regexp"
 )
 
-func getDirectoryInfo(path string, config *Config) (Directory, error) {
+func getDirectoryInfo(path string, ignore_settings *IgnoreSettings) (Directory, error) {
 	content, err := os.ReadDir(path)
 	if err != nil {
 		log.Println("Error reading directory: ", err)
@@ -19,12 +19,12 @@ func getDirectoryInfo(path string, config *Config) (Directory, error) {
 
 	for _, entry := range content {
 
-		if shouldEntryBeIgnored(entry.Name(), config) {
+		if shouldEntryBeIgnored(entry.Name(), ignore_settings) {
 			continue
 		}
 
 		if entry.IsDir() {
-			directoryInfo, err := getDirectoryInfo(path+"/"+entry.Name(), config)
+			directoryInfo, err := getDirectoryInfo(path+"/"+entry.Name(), ignore_settings)
 			if err != nil {
 				log.Println("Error getting directory info: ", err)
 				return Directory{}, err
@@ -54,20 +54,20 @@ func getDirectoryInfo(path string, config *Config) (Directory, error) {
 	return directory, nil
 }
 
-func shouldEntryBeIgnored(entry_name string, config *Config) bool {
-	for _, ignoreFile := range config.IgnoreSettings.IgnoreFiles {
+func shouldEntryBeIgnored(entry_name string, ignore_settings *IgnoreSettings) bool {
+	for _, ignoreFile := range ignore_settings.IgnoreFiles {
 		if entry_name == ignoreFile {
 			return true
 		}
 	}
 
-	for _, ignoreDir := range config.IgnoreSettings.IgnoreDirs {
+	for _, ignoreDir := range ignore_settings.IgnoreDirs {
 		if entry_name == ignoreDir {
 			return true
 		}
 	}
 
-	for _, ignoreFileWithPattern := range config.IgnoreSettings.IgnoreFilesWithPattern {
+	for _, ignoreFileWithPattern := range ignore_settings.IgnoreFilesWithPattern {
 		matched, _ := regexp.MatchString(ignoreFileWithPattern, entry_name)
 		if matched {
 			return true

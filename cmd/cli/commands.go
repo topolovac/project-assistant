@@ -1,30 +1,33 @@
 package main
 
 import (
-	"log"
-	"os"
+	"errors"
 
 	"github.com/urfave/cli/v2"
 )
 
-var Info = &cli.Command{
-	Name:   "info",
-	Usage:  "Pring directory info",
-	Action: info,
+var Init = &cli.Command{
+	Name:   "init",
+	Usage:  "Initialize project assistant. Creates basic documentation for your project and file summary.",
+	Action: initialise_documentation,
 }
 
-func info(ctx *cli.Context) error {
-	dir, err := os.Getwd()
+func initialise_documentation(ctx *cli.Context) error {
+	config, err := getConfig()
 	if err != nil {
-		log.Fatal(err)
+		return errors.New("Error getting config: " + err.Error())
 	}
 
-	config := getConfig()
+	logStructAsJSON(config)
 
-	dir_info, err := getDirectoryInfo(dir+"/"+config.RootPath, config)
+	err = createOutputDir(config)
 	if err != nil {
-		log.Println("Error getting directory info: ", err)
-		panic(err)
+		return errors.New("Error creating output directory: " + err.Error())
+	}
+
+	dir_info, err := getDirectoryInfo(config.RootPath, &config.IgnoreSettings)
+	if err != nil {
+		return errors.New("Error getting directory info: " + err.Error())
 	}
 
 	logStructAsJSON(dir_info)
