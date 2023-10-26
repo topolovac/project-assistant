@@ -6,19 +6,11 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-var Init = &cli.Command{
-	Name:   "init",
-	Usage:  "Initialize project assistant. Creates basic documentation for your project and file summary.",
-	Action: initialise_documentation,
-}
-
-func initialise_documentation(ctx *cli.Context) error {
+func (app *Application) initialise_documentation(ctx *cli.Context) error {
 	config, err := getConfig()
 	if err != nil {
 		return errors.New("Error getting config: " + err.Error())
 	}
-
-	logStructAsJSON(config)
 
 	err = createOutputDir(config)
 	if err != nil {
@@ -30,7 +22,10 @@ func initialise_documentation(ctx *cli.Context) error {
 		return errors.New("Error getting directory info: " + err.Error())
 	}
 
-	logStructAsJSON(dir_info)
+	err = app.CreateProjectSummary(dir_info)
+	if err != nil {
+		return errors.New("Error creating project summary: " + err.Error())
+	}
 
 	return nil
 }

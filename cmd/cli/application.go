@@ -70,7 +70,7 @@ func (app *Application) UpdateCodebase(dir_info Directory) error {
 	return nil
 }
 
-func (app *Application) createProjectSummary(dir_info Directory) error {
+func (app *Application) CreateProjectSummary(dir_info Directory) error {
 	log.Println("Creating file summary...")
 
 	fd := flattenDirectory(dir_info)

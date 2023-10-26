@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"os"
 
@@ -8,43 +9,42 @@ import (
 )
 
 func main() {
-	// config := getConfig()
+	config, err := getConfig()
+	if err != nil {
+		log.Println("Error getting config: ", err)
+		panic(err)
+	}
 
-	// get OPEN_API_KEY from env
-	jwt := os.Getenv("OPEN_API_KEY")
-	log.Println("OPEN_API_KEY: ", jwt)
+	// get open-api-key flag
+	var jwt string
+	flag.StringVar(&jwt, "oaikey", "", "OpenAI API Key")
 
-	// oai := OpenAI{
-	// 	jwt: ,
-	// }
+	log.Printf("OPEN_API_KEY value: ", jwt)
 
-	// oai.Init(oai.jwt)
+	oai := OpenAI{
+		jwt: jwt,
+	}
 
-	// app := Application{
-	// 	openAI: &oai,
-	// 	config: config,
-	// }
+	oai.Init(oai.jwt)
 
-	// logStructAsJSON(config)
+	app := Application{
+		openAI: &oai,
+		config: config,
+	}
 
-	// err := createOutputDir(app.config)
-
-	// if err != nil {
-	// 	log.Println("Error creating output directory: ", err)
-	// 	panic(err)
-	// }
-
-	// app.createProjectSummary(dir_info)
-
-	app := &cli.App{
+	cli := &cli.App{
 		Name:  "pa",
 		Usage: "Project Assistant for your codebase",
 		Commands: []*cli.Command{
-			Init,
+			{
+				Name:   "init",
+				Usage:  "Initialize project assistant. Creates basic documentation for your project and file summary.",
+				Action: app.initialise_documentation,
+			},
 		},
 	}
 
-	if err := app.Run(os.Args); err != nil {
+	if err := cli.Run(os.Args); err != nil {
 		log.Fatal(err)
 	}
 }
